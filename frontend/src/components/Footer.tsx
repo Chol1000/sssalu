@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
       <div className="container">
         <div className="footer-content">
           <div className="footer-section">
-            <h3><img src="/assets/images/logo.jpg" alt="SSSALU" style={{height: '40px'}} /></h3>
+            <h3><img src="/assets/images/logo.svg" alt="SSSALU" style={{height: '40px'}} /></h3>
             <p>South Sudanese Student Association at African Leadership University</p>
             <div className="social-links">
               <a href="https://www.facebook.com/sssalu" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-f"></i></a>
@@ -34,7 +34,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2023 South Sudanese Student Association - ALU. All rights reserved.</p>
+          <p>&copy; South Sudanese Student Association - ALU. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -27,7 +27,7 @@ const Header: React.FC = () => {
     <header>
       <div className="container">
         <div className="logo">
-          <img src="/assets/images/logo.jpg" alt="SSSALU Logo" />
+          <img src="/assets/images/logo.svg" alt="SSSALU Logo" />
         </div>
         <nav className={isMenuOpen ? 'active' : ''}>
           <ul>
