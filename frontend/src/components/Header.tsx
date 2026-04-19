@@ -4,10 +4,20 @@ import { Link, useLocation } from 'react-router-dom';
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+    setActiveDropdown(null);
   };
 
   const toggleDropdown = (dropdown: string) => {
@@ -24,42 +34,74 @@ const Header: React.FC = () => {
   }, [location]);
 
   return (
-    <header>
+    <header className={isScrolled ? 'scrolled' : ''}>
       <div className="container">
-        <div className="logo">
-          <img src="/assets/images/logo.svg" alt="SSSALU Logo" />
-        </div>
+        <Link to="/" className="logo">
+          <img src="/assets/images/sssalu-logo.png" alt="SSSALU" />
+        </Link>
+        
         <nav className={isMenuOpen ? 'active' : ''}>
           <ul>
-            <li><Link to="/" className={isActive('/')} onClick={() => setIsMenuOpen(false)}>Home</Link></li>
+            <li>
+              <Link to="/" className={isActive('/')} onClick={() => setIsMenuOpen(false)}>
+                Home
+              </Link>
+            </li>
+            
             <li className={`dropdown ${activeDropdown === 'about' ? 'active' : ''}`}>
-              <a href="#" className="dropdown-toggle" onClick={(e) => { e.preventDefault(); toggleDropdown('about'); }}>About <i className="fas fa-chevron-down"></i></a>
+              <button 
+                className="dropdown-toggle" 
+                onClick={() => toggleDropdown('about')}
+              >
+                About <i className="fas fa-chevron-down"></i>
+              </button>
               <ul className="dropdown-menu">
-                <li><Link to="/about" onClick={() => setIsMenuOpen(false)}>About Us</Link></li>
+                <li><Link to="/about" onClick={() => setIsMenuOpen(false)}>History</Link></li>
+                <li><Link to="/leadership" onClick={() => setIsMenuOpen(false)}>Leadership</Link></li>
                 <li><Link to="/alumni" onClick={() => setIsMenuOpen(false)}>Alumni</Link></li>
               </ul>
             </li>
+            
             <li className={`dropdown ${activeDropdown === 'activities' ? 'active' : ''}`}>
-              <a href="#" className="dropdown-toggle" onClick={(e) => { e.preventDefault(); toggleDropdown('activities'); }}>Activities <i className="fas fa-chevron-down"></i></a>
+              <button 
+                className="dropdown-toggle" 
+                onClick={() => toggleDropdown('activities')}
+              >
+                Activities <i className="fas fa-chevron-down"></i>
+              </button>
               <ul className="dropdown-menu">
                 <li><Link to="/events" onClick={() => setIsMenuOpen(false)}>Events</Link></li>
                 <li><Link to="/projects" onClick={() => setIsMenuOpen(false)}>Projects</Link></li>
                 <li><Link to="/gallery" onClick={() => setIsMenuOpen(false)}>Gallery</Link></li>
               </ul>
             </li>
+            
             <li className={`dropdown ${activeDropdown === 'community' ? 'active' : ''}`}>
-              <a href="#" className="dropdown-toggle" onClick={(e) => { e.preventDefault(); toggleDropdown('community'); }}>Community <i className="fas fa-chevron-down"></i></a>
+              <button 
+                className="dropdown-toggle" 
+                onClick={() => toggleDropdown('community')}
+              >
+                Community <i className="fas fa-chevron-down"></i>
+              </button>
               <ul className="dropdown-menu">
-                <li><Link to="/news" onClick={() => setIsMenuOpen(false)}>News & Blog</Link></li>
-                <li><Link to="/membership" onClick={() => setIsMenuOpen(false)}>Membership</Link></li>
+                <li><Link to="/news" onClick={() => setIsMenuOpen(false)}>News</Link></li>
+                <li><Link to="/faq" onClick={() => setIsMenuOpen(false)}>FAQ</Link></li>
               </ul>
             </li>
-            <li><Link to="/contact" className={isActive('/contact')} onClick={() => setIsMenuOpen(false)}>Contact</Link></li>
+            
+            <li>
+              <Link to="/contact" className={isActive('/contact')} onClick={() => setIsMenuOpen(false)}>
+                Contact
+              </Link>
+            </li>
           </ul>
         </nav>
-        <div className="menu-toggle" onClick={toggleMenu}>
-          <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
-        </div>
+        
+        <button className={`menu-toggle ${isMenuOpen ? 'active' : ''}`} onClick={toggleMenu}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </header>
   );

@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 
 interface AlumniMember {
   id: number;
@@ -9,490 +8,372 @@ interface AlumniMember {
   program: string;
   current_position: string;
   company: string;
-  email: string;
-  linkedin: string;
-  photo: string;
   bio: string;
-  achievements: string;
-  created_at: string;
+  photo: string;
+  linkedin?: string;
 }
 
 const Alumni: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [alumni, setAlumni] = useState<AlumniMember[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showMentorForm, setShowMentorForm] = useState(false);
-  const [showRequestForm, setShowRequestForm] = useState(false);
-  const [mentorMessage, setMentorMessage] = useState('');
-  const [requestMessage, setRequestMessage] = useState('');
-  
-  useEffect(() => {
-    fetchAlumni();
-  }, []);
+  const [selectedAlumni, setSelectedAlumni] = useState<AlumniMember | null>(null);
 
-  const fetchAlumni = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/api/alumni/');
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setAlumni(data);
-      }
-    } catch (error) {
-      console.error('Error fetching alumni:', error);
-    } finally {
-      setLoading(false);
-    }
+  const staticAlumni: AlumniMember[] = [
+  {
+    id: 1,
+    first_name: 'Long',
+    last_name: 'Maker',
+    graduation_year: 2024,
+    program: 'Software Engineering',
+    current_position: 'Software Engineer',
+    company: 'Tech Company',
+    bio: 'Long Maker graduated from ALU in 2023 with a degree in Software Engineering. During his time at ALU, he demonstrated exceptional technical skills and leadership abilities. He actively contributed to various student projects and initiatives within the South Sudanese Student Association. After graduation, Long secured a position as a Software Engineer at a leading tech company, where he continues to develop innovative solutions and mentor current students.',
+    photo: '/assets/images/Longmakeralumni.jpg',
+    linkedin: 'https://www.linkedin.com'
+  },
+  {
+    id: 2,
+    first_name: 'Abraham',
+    last_name: 'Aruei',
+    graduation_year: 2024,
+    program: 'Computer Science',
+    current_position: 'Founder, Silicon High School',
+    company: 'Silicon High School',
+    bio: 'Abraham Aruei graduated from ALU in 2024 with a degree in Computer Science. Throughout his academic journey, he was passionate about creating sustainable solutions for African markets. He played an active role in the South Sudanese Student Association and led several community initiatives. After graduation, Abraham founded Silicon High School in Uganda, an institution focused on providing quality technology education and empowering the next generation of African innovators.',
+    photo: '/assets/images/aruei_alumni.jpg',
+    linkedin: 'https://www.linkedin.com'
+  }
+];
+
+  const openModal = (alumni: AlumniMember) => {
+    setSelectedAlumni(alumni);
   };
 
-  const displayAlumni = alumni.length > 0 ? alumni : [];
-  
-  const [mentorFormData, setMentorFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    graduation_year: '',
-    program: '',
-    current_position: '',
-    company: '',
-    experience_years: '',
-    expertise_areas: '',
-    mentoring_experience: '',
-    availability: '',
-    motivation: ''
-  });
-
-  const [requestFormData, setRequestFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    student_id: '',
-    program: '',
-    year_of_study: '',
-    career_interests: '',
-    mentoring_goals: '',
-    preferred_mentor_background: '',
-    availability: '',
-    additional_info: ''
-  });
-
-  const [connectMessage, setConnectMessage] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:8000/api/newsletter/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-      
-      const result = await response.json();
-      setConnectMessage(result.message);
-      
-      if (result.status === 'success' || result.status === 'info') {
-        setEmail('');
-      }
-    } catch (error) {
-      setConnectMessage('Error: Failed to join network. Please try again.');
-    }
-    setTimeout(() => setConnectMessage(''), 5000);
-  };
-
-  const handleMentorSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:8000/api/mentor-application/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(mentorFormData),
-      });
-      const result = await response.json();
-      setMentorMessage(result.message);
-      if (result.status === 'success') {
-        setMentorFormData({
-          first_name: '', last_name: '', email: '', phone: '', graduation_year: '',
-          program: '', current_position: '', company: '', experience_years: '',
-          expertise_areas: '', mentoring_experience: '', availability: '', motivation: ''
-        });
-      }
-    } catch (error) {
-      setMentorMessage('Error: Failed to submit application.');
-    }
-    setTimeout(() => setMentorMessage(''), 5000);
-  };
-
-  const handleRequestSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:8000/api/mentor-request/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestFormData),
-      });
-      const result = await response.json();
-      setRequestMessage(result.message);
-      if (result.status === 'success') {
-        setRequestFormData({
-          first_name: '', last_name: '', email: '', phone: '', student_id: '',
-          program: '', year_of_study: '', career_interests: '', mentoring_goals: '',
-          preferred_mentor_background: '', availability: '', additional_info: ''
-        });
-      }
-    } catch (error) {
-      setRequestMessage('Error: Failed to submit request.');
-    }
-    setTimeout(() => setRequestMessage(''), 5000);
-  };
-
-  const handleMentorChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setMentorFormData({ ...mentorFormData, [e.target.name]: e.target.value });
-  };
-
-  const handleRequestChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setRequestFormData({ ...requestFormData, [e.target.name]: e.target.value });
+  const closeModal = () => {
+    setSelectedAlumni(null);
   };
 
   return (
     <div>
       {/* Page Banner */}
       <section style={{
-        height: '80vh',
-        minHeight: '600px',
-        position: 'relative',
+        height: '60vh',
+        minHeight: '400px',
+        background: 'url("/assets/images/background_images1.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
         color: 'var(--white)',
-        paddingTop: '80px',
-        overflow: 'hidden'
+        marginTop: '0',
+        position: 'relative'
       }}>
-        <video 
-          autoPlay 
-          muted 
-          loop 
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            zIndex: -2
-          }}
-        >
-          <source src="/assets/videos/alumni_video.mp4" type="video/mp4" />
-        </video>
-        <div style={{
+        <div style={{ 
           position: 'absolute',
           top: 0,
           left: 0,
-          width: '100%',
-          height: '100%',
-          background: 'rgba(0, 0, 0, 0.5)',
-          zIndex: -1
-        }} />
-        <div style={{ maxWidth: '800px', padding: '0 20px', zIndex: 1 }}>
-          <h1 style={{ fontSize: '3rem', marginBottom: '15px', fontWeight: '700' }}>Alumni Network</h1>
-          <p style={{ fontSize: '1.2rem' }}>Connecting past, present, and future South Sudanese students at ALU</p>
-        </div>
-      </section>
-
-      {/* Alumni Introduction */}
-      <section className="alumni-intro">
-        <div className="container">
-          <div className="intro-content">
-            <h2 className="section-title">Our Alumni Community</h2>
-            <p>The South Sudanese Student Association at African Leadership University takes pride in our growing network of alumni who continue to represent our values and make significant contributions in various fields and sectors.</p>
-            <p>Our alumni remain an integral part of our community, providing mentorship, guidance, and support to current students while serving as ambassadors of both SSSALU and ALU in their professional endeavors.</p>
-          </div>
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.3)'
+        }}></div>
+        <div style={{ maxWidth: '800px', padding: '0 20px', position: 'relative', zIndex: 2 }}>
+          <h1 style={{ fontSize: '3rem', marginBottom: '0', fontWeight: '700' }}>Alumni Network</h1>
         </div>
       </section>
 
       {/* Alumni Directory */}
-      <section className="alumni-spotlight">
+      <section style={{ padding: '80px 0', background: 'var(--white)' }}>
         <div className="container">
-          <h2 className="section-title">Alumni Directory</h2>
-          <p className="section-description">Meet our outstanding alumni and learn about their journeys after ALU</p>
+          <h2 className="section-title">Our Alumni Community</h2>
+          <p className="section-description" style={{ maxWidth: '900px', margin: '0 auto 60px' }}>
+            Meet our outstanding alumni and learn about their journeys after ALU. Click on any alumni to learn more about them.
+          </p>
 
-          <div className="alumni-grid">
-            {loading ? (
-              <div style={{ textAlign: 'center', padding: '50px' }}>Loading alumni...</div>
-            ) : displayAlumni.length > 0 ? (
-              displayAlumni.map((member, index) => (
-                <div key={member.id} className="alumni-card">
-                  <div className="alumni-image">
-                    <img 
-                      src={member.photo ? 
-                        `http://localhost:8000${member.photo}` : 
-                        '/assets/images/default-avatar.jpg'
-                      } 
-                      alt={`${member.first_name} ${member.last_name}`} 
-                    />
-                  </div>
-                  <div className="alumni-content">
-                    <h3>{member.first_name} {member.last_name}</h3>
-                    <p className="alumni-title">{member.current_position} at {member.company}</p>
-                    <p className="alumni-graduation">Class of {member.graduation_year} | {member.program}</p>
-                    <p className="alumni-description">{member.bio}</p>
-                    {member.linkedin && (
-                      <div className="alumni-social">
-                        <a href={member.linkedin} target="_blank" rel="noopener noreferrer">
-                          <i className="fab fa-linkedin-in"></i>
-                        </a>
-                      </div>
-                    )}
-                  </div>
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '32px',
+            maxWidth: '1200px',
+            margin: '0 auto'
+          }}>
+            {staticAlumni.map((member) => (
+              <div 
+                key={member.id}
+                onClick={() => openModal(member)}
+                style={{
+                  background: 'var(--white)',
+                  border: '1px solid var(--border)',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--secondary)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <div style={{ height: '280px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
+                  <img 
+                    src={member.photo} 
+                    alt={`${member.first_name} ${member.last_name}`}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
                 </div>
-              ))
-            ) : (
-              <div style={{ textAlign: 'center', padding: '50px' }}>
-                <p>No alumni profiles available. Add alumni through the admin panel.</p>
+                <div style={{ padding: '24px', textAlign: 'center' }}>
+                  <h3 style={{ 
+                    fontFamily: 'Crimson Text, serif', 
+                    fontSize: '22px', 
+                    fontWeight: '600', 
+                    marginBottom: '8px', 
+                    color: 'var(--primary)' 
+                  }}>
+                    {member.first_name} {member.last_name}
+                  </h3>
+                  <h4 style={{ 
+                    fontSize: '13px', 
+                    fontWeight: '600', 
+                    color: 'var(--secondary)', 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.8px',
+                    marginBottom: '4px'
+                  }}>
+                    {member.current_position}
+                  </h4>
+                  <p style={{ 
+                    fontSize: '12px', 
+                    color: 'var(--text-light)', 
+                    marginBottom: '12px'
+                  }}>
+                    Class of {member.graduation_year}
+                  </p>
+                  <p style={{ 
+                    color: 'var(--text-light)', 
+                    fontSize: '14px',
+                    lineHeight: '1.6',
+                    textAlign: 'left',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}>
+                    {member.bio}
+                  </p>
+                </div>
               </div>
-            )}
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Alumni Modal */}
+      {selectedAlumni && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.85)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            overflowY: 'auto'
+          }}
+          onClick={closeModal}
+        >
+          <div 
+            style={{
+              background: 'var(--white)',
+              maxWidth: '700px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              onClick={closeModal}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'var(--white)',
+                border: '1px solid var(--border)',
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                fontSize: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10,
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--secondary)';
+                e.currentTarget.style.color = 'var(--white)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'var(--white)';
+                e.currentTarget.style.color = 'var(--text)';
+              }}
+            >
+              <i className="fas fa-times"></i>
+            </button>
             
-
-          </div>
-        </div>
-      </section>
-
-      {/* Where Are They Now Map */}
-      <section className="alumni-map-section">
-        <div className="container">
-          <h2 className="section-title">Where Are They Now</h2>
-          <p className="section-description">Our alumni are making an impact across the globe in various sectors and industries</p>
-
-          <div className="alumni-map">
-            {/* Images removed */}
-          </div>
-
-          <div className="alumni-stats">
-            <div className="stat-card">
-              <div className="stat-number">15+</div>
-              <div className="stat-label">Alumni</div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-number">5+</div>
-              <div className="stat-label">Companies</div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-number">7+</div>
-              <div className="stat-label">Software Engineers</div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-number">10+</div>
-              <div className="stat-label">Entrepreneurs</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mentorship Program */}
-      <section className="mentorship-section">
-        <div className="container">
-          <h2 className="section-title">Alumni Mentorship Program</h2>
-          <p className="section-description">Connecting current students with alumni mentors for guidance and support</p>
-
-          <div className="mentorship-content" style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
-            <div className="mentorship-info" style={{ flex: 1 }}>
-              <h3>About the Program</h3>
-              <p>The SSSALU Alumni Mentorship Program pairs current students with alumni mentors who provide guidance on academic success, career development, and personal growth. Mentors and mentees meet regularly throughout the academic year to set goals, track progress, and build meaningful relationships.</p>
-            </div>
-            <div className="mentorship-benefits" style={{ flex: 1 }}>
-              <h3>Program Benefits</h3>
-              <ul className="benefits-list">
-                <li><i className="fas fa-check-circle"></i> Personalized guidance from experienced alumni</li>
-                <li><i className="fas fa-check-circle"></i> Career advice and industry insights</li>
-                <li><i className="fas fa-check-circle"></i> Networking opportunities with professionals</li>
-                <li><i className="fas fa-check-circle"></i> Support for academic and personal challenges</li>
-                <li><i className="fas fa-check-circle"></i> Development of professional skills and competencies</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mentorship-cta" style={{ textAlign: 'center', marginTop: '30px' }}>
-            <button onClick={() => setShowMentorForm(true)} className="btn">Become a Mentor</button>
-            <button onClick={() => setShowRequestForm(true)} className="btn btn-outline">Request a Mentor</button>
-          </div>
-        </div>
-      </section>
-
-      {/* Mentor Application Form Modal */}
-      {showMentorForm && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: 'white', borderRadius: '10px', padding: '30px', maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2>Become a Mentor</h2>
-              <button onClick={() => setShowMentorForm(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
-            </div>
-            
-            {mentorMessage && (
-              <div style={{ color: mentorMessage.includes('Error') ? 'red' : 'green', fontWeight: 'bold', textAlign: 'center', marginBottom: '20px', padding: '10px', background: mentorMessage.includes('Error') ? '#f8d7da' : '#d4edda', borderRadius: '5px' }}>
-                {mentorMessage}
-              </div>
-            )}
-
-            <form onSubmit={handleMentorSubmit}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                <input type="text" name="first_name" placeholder="First Name" value={mentorFormData.first_name} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-                <input type="text" name="last_name" placeholder="Last Name" value={mentorFormData.last_name} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                <input type="email" name="email" placeholder="Email" value={mentorFormData.email} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-                <input type="tel" name="phone" placeholder="Phone" value={mentorFormData.phone} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                <input type="number" name="graduation_year" placeholder="Graduation Year" value={mentorFormData.graduation_year} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-                <select name="program" value={mentorFormData.program} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}>
-                  <option value="">Select Program</option>
-                  <option value="Software Engineering">Software Engineering</option>
-                  <option value="Entrepreneurial Leadership">Entrepreneurial Leadership</option>
-                  <option value="International Business & Trade">International Business & Trade</option>
-                </select>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                <input type="text" name="current_position" placeholder="Current Position" value={mentorFormData.current_position} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-                <input type="text" name="company" placeholder="Company" value={mentorFormData.company} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-              </div>
-              <input type="number" name="experience_years" placeholder="Years of Experience" value={mentorFormData.experience_years} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '15px' }} />
-              <textarea name="expertise_areas" placeholder="Areas of Expertise" value={mentorFormData.expertise_areas} onChange={handleMentorChange} required rows={3} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '15px', resize: 'vertical' }} />
-              <textarea name="mentoring_experience" placeholder="Previous Mentoring Experience" value={mentorFormData.mentoring_experience} onChange={handleMentorChange} required rows={3} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '15px', resize: 'vertical' }} />
-              <input type="text" name="availability" placeholder="Availability (e.g., Weekends, Evenings)" value={mentorFormData.availability} onChange={handleMentorChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '15px' }} />
-              <textarea name="motivation" placeholder="Why do you want to become a mentor?" value={mentorFormData.motivation} onChange={handleMentorChange} required rows={4} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '20px', resize: 'vertical' }} />
-              <button type="submit" className="btn" style={{ width: '100%' }}>Submit Application</button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Mentor Request Form Modal */}
-      {showRequestForm && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: 'white', borderRadius: '10px', padding: '30px', maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2>Request a Mentor</h2>
-              <button onClick={() => setShowRequestForm(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
+            <div style={{ height: '400px', overflow: 'hidden' }}>
+              <img 
+                src={selectedAlumni.photo} 
+                alt={`${selectedAlumni.first_name} ${selectedAlumni.last_name}`}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', background: 'var(--bg-light)' }}
+              />
             </div>
             
-            {requestMessage && (
-              <div style={{ color: requestMessage.includes('Error') ? 'red' : 'green', fontWeight: 'bold', textAlign: 'center', marginBottom: '20px', padding: '10px', background: requestMessage.includes('Error') ? '#f8d7da' : '#d4edda', borderRadius: '5px' }}>
-                {requestMessage}
-              </div>
-            )}
-
-            <form onSubmit={handleRequestSubmit}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                <input type="text" name="first_name" placeholder="First Name" value={requestFormData.first_name} onChange={handleRequestChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-                <input type="text" name="last_name" placeholder="Last Name" value={requestFormData.last_name} onChange={handleRequestChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                <input type="email" name="email" placeholder="Email" value={requestFormData.email} onChange={handleRequestChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-                <input type="tel" name="phone" placeholder="Phone" value={requestFormData.phone} onChange={handleRequestChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-                <input type="text" name="student_id" placeholder="Student ID" value={requestFormData.student_id} onChange={handleRequestChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
-                <select name="program" value={requestFormData.program} onChange={handleRequestChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}>
-                  <option value="">Select Program</option>
-                  <option value="Software Engineering">Software Engineering</option>
-                  <option value="Entrepreneurial Leadership">Entrepreneurial Leadership</option>
-                  <option value="International Business & Trade">International Business & Trade</option>
-                </select>
-              </div>
-              <select name="year_of_study" value={requestFormData.year_of_study} onChange={handleRequestChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '15px' }}>
-                <option value="">Select Year of Study</option>
-                <option value="Year 1">Year 1</option>
-                <option value="Year 2">Year 2</option>
-                <option value="Year 3">Year 3</option>
-                <option value="Year 4">Year 4</option>
-              </select>
-              <textarea name="career_interests" placeholder="Career Interests" value={requestFormData.career_interests} onChange={handleRequestChange} required rows={3} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '15px', resize: 'vertical' }} />
-              <textarea name="mentoring_goals" placeholder="What do you hope to achieve through mentoring?" value={requestFormData.mentoring_goals} onChange={handleRequestChange} required rows={3} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '15px', resize: 'vertical' }} />
-              <textarea name="preferred_mentor_background" placeholder="Preferred Mentor Background" value={requestFormData.preferred_mentor_background} onChange={handleRequestChange} required rows={3} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '15px', resize: 'vertical' }} />
-              <input type="text" name="availability" placeholder="Availability (e.g., Weekends, Evenings)" value={requestFormData.availability} onChange={handleRequestChange} required style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '15px' }} />
-              <textarea name="additional_info" placeholder="Additional Information (Optional)" value={requestFormData.additional_info} onChange={handleRequestChange} rows={3} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', width: '100%', marginBottom: '20px', resize: 'vertical' }} />
-              <button type="submit" className="btn" style={{ width: '100%' }}>Submit Request</button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Support & Donate */}
-      <section className="support-section">
-        <div className="container">
-          <h2 className="section-title">Support Our Community</h2>
-          <p className="section-description">Help us empower the next generation of South Sudanese leaders at ALU.</p>
-
-          <div className="support-options">
-            <div className="support-card">
-              <h3>Financial Support</h3>
-              <p>Your contribution strengthens scholarships, student led events, and community initiatives that support South Sudanese students at ALU.</p>
-            </div>
-
-            <div className="support-card">
-              <h3>Internships & Employment Opportunities</h3>
-              <p>Provide internship or job opportunities for current students and recent graduates to help them build practical experience and professional confidence.</p>
-            </div>
-
-            <div className="support-card">
-              <h3>Guest Engagement</h3>
-              <p>Share your knowledge and lived experiences with students through talks, workshops, or panel discussions that inspire growth and leadership.</p>
-            </div>
-
-            <div className="support-card">
-              <h3>Strategic Collaboration</h3>
-              <p>Partner with SSSALU on initiatives that advance education, innovation, and national development for South Sudan.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* Stay Connected */}
-      <section className="stay-connected">
-        <div className="container">
-          <h2>Stay Connected</h2>
-          <p>Join our alumni network to stay updated with the latest news, events, and opportunities</p>
-
-          <form className="alumni-form" onSubmit={handleSubmit}>
-            {connectMessage && (
-              <div style={{ 
-                color: connectMessage.includes('Error') ? 'red' : 'green', 
-                fontWeight: 'bold', 
-                textAlign: 'center', 
-                marginBottom: '15px',
-                padding: '10px',
-                background: connectMessage.includes('Error') ? '#f8d7da' : '#d4edda',
-                border: `1px solid ${connectMessage.includes('Error') ? '#f5c6cb' : '#c3e6cb'}`,
-                borderRadius: '5px'
+            <div style={{ padding: '40px' }}>
+              <h2 style={{ 
+                fontFamily: 'Crimson Text, serif', 
+                fontSize: '32px', 
+                fontWeight: '600', 
+                marginBottom: '10px', 
+                color: 'var(--primary)' 
               }}>
-                {connectMessage}
-              </div>
-            )}
-            <input 
-              type="email" 
-              placeholder="Enter your email address" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required 
-            />
-            <button type="submit" className="btn">Join Alumni Network</button>
-          </form>
+                {selectedAlumni.first_name} {selectedAlumni.last_name}
+              </h2>
+              <h3 style={{ 
+                fontSize: '16px', 
+                fontWeight: '600', 
+                color: 'var(--secondary)', 
+                textTransform: 'uppercase', 
+                letterSpacing: '1px',
+                marginBottom: '8px'
+              }}>
+                {selectedAlumni.current_position}
+              </h3>
+              <p style={{ 
+                fontSize: '15px', 
+                color: 'var(--text-light)', 
+                marginBottom: '24px'
+              }}>
+                Class of {selectedAlumni.graduation_year} • {selectedAlumni.program}
+              </p>
+              <p style={{ 
+                color: 'var(--text-light)', 
+                lineHeight: '1.8', 
+                fontSize: '15px',
+                marginBottom: '32px'
+              }}>
+                {selectedAlumni.bio}
+              </p>
+              
+              {selectedAlumni.linkedin && (
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                  <a 
+                    href={selectedAlumni.linkedin} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      border: '1px solid var(--border)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--text)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'var(--secondary)';
+                      e.currentTarget.style.color = 'var(--white)';
+                      e.currentTarget.style.borderColor = 'var(--secondary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = 'var(--text)';
+                      e.currentTarget.style.borderColor = 'var(--border)';
+                    }}
+                  >
+                    <i className="fab fa-linkedin-in"></i>
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
-          <div className="social-links-large">
-            <a href="#" className="social-link"><i className="fab fa-facebook-f"></i></a>
-            <a href="#" className="social-link"><i className="fab fa-twitter"></i></a>
-            <a href="#" className="social-link"><i className="fab fa-instagram"></i></a>
-            <a href="#" className="social-link"><i className="fab fa-linkedin-in"></i></a>
+      {/* Alumni Impact */}
+      <section style={{ padding: '80px 0', background: 'var(--bg-light)' }}>
+        <div className="container" style={{ maxWidth: '900px', textAlign: 'center' }}>
+          <h2 className="section-title">Our Alumni Impact</h2>
+          <p style={{ color: 'var(--text-light)', fontSize: '16px', lineHeight: '1.8', marginBottom: '50px' }}>
+            Our alumni remain an integral part of our community, providing mentorship, guidance, and support to current students while serving as ambassadors of both SSSALU and ALU in their professional endeavors.
+          </p>
+
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '40px',
+            marginTop: '50px'
+          }}>
+            <div>
+              <div style={{ fontSize: '42px', fontWeight: '700', color: 'var(--secondary)', marginBottom: '8px' }}>15+</div>
+              <div style={{ fontSize: '14px', color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '1px' }}>Alumni</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '42px', fontWeight: '700', color: 'var(--secondary)', marginBottom: '8px' }}>5+</div>
+              <div style={{ fontSize: '14px', color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '1px' }}>Companies</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '42px', fontWeight: '700', color: 'var(--secondary)', marginBottom: '8px' }}>7+</div>
+              <div style={{ fontSize: '14px', color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '1px' }}>Engineers</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '42px', fontWeight: '700', color: 'var(--secondary)', marginBottom: '8px' }}>10+</div>
+              <div style={{ fontSize: '14px', color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '1px' }}>Entrepreneurs</div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Mentorship & Support */}
+      <section style={{ padding: '80px 0', background: 'var(--white)' }}>
+        <div className="container" style={{ maxWidth: '1100px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'start' }}>
+            {/* Mentorship */}
+            <div>
+              <h2 style={{ fontSize: '28px', fontWeight: '600', marginBottom: '20px', color: 'var(--primary)' }}>Alumni Mentorship</h2>
+              <p style={{ color: 'var(--text-light)', fontSize: '15px', lineHeight: '1.8', marginBottom: '30px' }}>
+                Connect with experienced alumni who provide guidance on academic success, career development, and personal growth. Our mentorship program creates lasting relationships that support both mentors and mentees throughout their journeys.
+              </p>
+              <p style={{ color: 'var(--text-light)', fontSize: '15px', lineHeight: '1.8' }}>
+                Whether you're seeking guidance or ready to give back, join our community of mentors and mentees building the future together.
+              </p>
+            </div>
+
+            {/* Support */}
+            <div>
+              <h2 style={{ fontSize: '28px', fontWeight: '600', marginBottom: '20px', color: 'var(--primary)' }}>Support Our Community</h2>
+              <p style={{ color: 'var(--text-light)', fontSize: '15px', lineHeight: '1.8', marginBottom: '30px' }}>
+                Help empower the next generation of South Sudanese leaders at ALU through scholarships, internships, guest speaking, or strategic partnerships.
+              </p>
+              <p style={{ color: 'var(--text-light)', fontSize: '15px', lineHeight: '1.8' }}>
+                Your support strengthens our community and creates opportunities for students to thrive academically and professionally.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 };

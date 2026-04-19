@@ -2,54 +2,12 @@ import React, { useState } from 'react';
 
 const Membership: React.FC = () => {
   const [message, setMessage] = useState('');
-  const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    student_id: '',
-    program: '',
-    year_of_study: '',
-    membership_type: 'regular'
-  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:8000/api/membership/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      
-      const result = await response.json();
-      setMessage(result.message);
-      
-      if (result.status === 'success') {
-        setFormData({
-          first_name: '',
-          last_name: '',
-          email: '',
-          phone: '',
-          student_id: '',
-          program: '',
-          year_of_study: '',
-          membership_type: 'regular'
-        });
-      }
-    } catch (error) {
-      setMessage('Error: Failed to submit application. Please try again.');
-    }
+    setMessage('Thank you for your application! We will review it and get back to you soon.');
     setTimeout(() => setMessage(''), 5000);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    (e.target as HTMLFormElement).reset();
   };
   return (
     <div>
@@ -113,8 +71,6 @@ const Membership: React.FC = () => {
                     type="text" 
                     id="first-name" 
                     name="first_name" 
-                    value={formData.first_name}
-                    onChange={handleChange}
                     required 
                   />
                 </div>
@@ -124,8 +80,6 @@ const Membership: React.FC = () => {
                     type="text" 
                     id="last-name" 
                     name="last_name" 
-                    value={formData.last_name}
-                    onChange={handleChange}
                     required 
                   />
                 </div>
@@ -138,8 +92,6 @@ const Membership: React.FC = () => {
                     type="email" 
                     id="email" 
                     name="email" 
-                    value={formData.email}
-                    onChange={handleChange}
                     required 
                   />
                 </div>
@@ -149,8 +101,6 @@ const Membership: React.FC = () => {
                     type="tel" 
                     id="phone" 
                     name="phone" 
-                    value={formData.phone}
-                    onChange={handleChange}
                     required 
                   />
                 </div>
@@ -166,8 +116,6 @@ const Membership: React.FC = () => {
                     type="text" 
                     id="student-id" 
                     name="student_id" 
-                    value={formData.student_id}
-                    onChange={handleChange}
                     required 
                   />
                 </div>
@@ -176,8 +124,6 @@ const Membership: React.FC = () => {
                   <select 
                     id="program" 
                     name="program" 
-                    value={formData.program}
-                    onChange={handleChange}
                     required
                   >
                     <option value="" disabled>Select your program</option>
@@ -194,8 +140,6 @@ const Membership: React.FC = () => {
                   <select 
                     id="year-of-study" 
                     name="year_of_study" 
-                    value={formData.year_of_study}
-                    onChange={handleChange}
                     required
                   >
                     <option value="" disabled>Select your year</option>
@@ -211,8 +155,6 @@ const Membership: React.FC = () => {
                   <select 
                     id="membership-type" 
                     name="membership_type" 
-                    value={formData.membership_type}
-                    onChange={handleChange}
                     required
                   >
                     <option value="regular">Regular Member</option>
