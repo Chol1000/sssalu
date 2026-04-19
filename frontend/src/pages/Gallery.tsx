@@ -68,10 +68,7 @@ const Gallery: React.FC = () => {
             Explore our collection of memories from events, activities, and special moments
           </p>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(4, 1fr)', 
-            gap: '24px',
+          <div className="gallery-grid" style={{ 
             maxWidth: '1200px',
             margin: '0 auto'
           }}>
@@ -79,13 +76,7 @@ const Gallery: React.FC = () => {
               <div 
                 key={item.id}
                 onClick={() => openModal(item.image)}
-                style={{
-                  height: '280px',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  border: '1px solid var(--border)',
-                  transition: 'all 0.3s ease'
-                }}
+                className="gallery-item"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'var(--secondary)';
                   e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
