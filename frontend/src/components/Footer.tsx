@@ -39,17 +39,14 @@ const Footer: React.FC = () => {
           <div className="footer-section">
             <h3>Follow Us</h3>
             <div className="footer-social-links">
-              <a href="https://www.facebook.com/sssalu" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.facebook.com/SSSAALU" target="_blank" rel="noopener noreferrer">
                 <i className="fab fa-facebook-f"></i>
               </a>
-              <a href="https://www.twitter.com/sssalu" target="_blank" rel="noopener noreferrer">
-                <i className="fab fa-twitter"></i>
-              </a>
-              <a href="https://www.instagram.com/sssalu" target="_blank" rel="noopener noreferrer">
-                <i className="fab fa-instagram"></i>
-              </a>
-              <a href="https://www.linkedin.com/company/sssalu" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.linkedin.com/company/south-sudanese-students-association-at-alu/" target="_blank" rel="noopener noreferrer">
                 <i className="fab fa-linkedin-in"></i>
+              </a>
+              <a href="https://www.tiktok.com/@sudo_alu?_r=1&_t=ZS-95gBq8NSjLw" target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-tiktok"></i>
               </a>
             </div>
           </div>
